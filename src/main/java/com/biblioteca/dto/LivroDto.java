@@ -12,6 +12,3 @@ public record LivroDto(String titulo, String autor, String categoria) {
         return new Livro(titulo, autor, cat);
     }
 }
-
-
-

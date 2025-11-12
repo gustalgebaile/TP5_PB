@@ -13,18 +13,18 @@ repositories {
 }
 
 dependencies {
-    api(libs.org.springframework.boot.spring.boot.starter.web)
-    api(libs.org.springframework.boot.spring.boot.starter.validation)
-    runtimeOnly(libs.org.springframework.boot.spring.boot.devtools)
+    api("org.springframework.boot:spring-boot-starter-web:3.1.4")
+    api("org.springframework.boot:spring-boot-starter-validation:3.1.4")
+    runtimeOnly("org.springframework.boot:spring-boot-devtools:3.1.4")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testImplementation("org.junit.platform:junit-platform-launcher:1.9.3")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(libs.org.seleniumhq.selenium.selenium.java)
-    testImplementation(libs.io.github.bonigarcia.webdrivermanager)
-    testImplementation(libs.org.assertj.assertj.core)
-    testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
-    testImplementation(libs.org.awaitility.awaitility)
+    testImplementation("org.seleniumhq.selenium:selenium-java:4.11.0")
+    testImplementation("io.github.bonigarcia:webdrivermanager:5.5.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.4")
+    testImplementation("org.awaitility:awaitility:4.2.0")
 }
 sourceSets {
     main {

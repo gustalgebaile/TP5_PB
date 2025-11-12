@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.biblioteca</groupId>
-    <artifactId>TP2_PB</artifactId>
+    <artifactId>TP3_PB</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -14,7 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</jacoco.agent>
     </properties>
 
     <parent>

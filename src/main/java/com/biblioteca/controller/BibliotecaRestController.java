@@ -47,4 +47,3 @@ public class BibliotecaRestController {
         return ResponseEntity.ok().build();
     }
 }
-

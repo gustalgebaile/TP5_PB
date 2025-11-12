@@ -52,8 +52,4 @@
         if (!confirm(`Remover ${e.target.dataset.titulo}?`)) return;
         fetch('/api/livros/' + encodeURIComponent(e.target.dataset.titulo), { method:'DELETE' })
           .then(()=> location.reload());
-      }
-    });
-</script>
-</body>
-</html>
+      }});</script></body></html>
