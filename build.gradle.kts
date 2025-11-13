@@ -37,7 +37,7 @@ sourceSets {
 
 group = "com.biblioteca"
 version = "2.0-SNAPSHOT"
-description = "TP3_PB"
+description = "TP4_PB"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
