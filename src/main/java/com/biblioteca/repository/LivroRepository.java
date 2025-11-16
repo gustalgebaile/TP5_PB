@@ -1,6 +1,7 @@
 package com.biblioteca.repository;
 
 import com.biblioteca.exception.LivroDuplicadoException;
+import com.biblioteca.exception.LivroNaoEncontradoException;
 import com.biblioteca.model.Livro;
 import com.biblioteca.model.LivroNulo;
 
@@ -22,7 +23,7 @@ public class LivroRepository {
         Objects.requireNonNull(novoLivro, "Livro não pode ser null");
         String keyAntigo = normalize(tituloAntigo);
         if (!porTitulo.containsKey(keyAntigo)) {
-            return;
+            throw new LivroNaoEncontradoException("Livro não encontrado: " + tituloAntigo);
         }
         porTitulo.remove(keyAntigo);
         porTitulo.put(normalize(novoLivro.getTitulo()), novoLivro);
