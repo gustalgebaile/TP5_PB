@@ -229,15 +229,6 @@ TP4/
 └── .gitignore                     # Arquivos ignorados pelo Git
 ```
 
----
-
-## Requisitos atendidos
-
-- **Refatoração de código**: Estrutura modular com separação clara de responsabilidades
-- **Cobertura de testes**: ≥85% de cobertura medida por Jacoco
-- **GitHub Actions**: Workflow automatizado para build, teste e relatório
-- **Readme**: Manual completo com instruções de execução e interpretação
-
 Github: https://github.com/gustalgebaile/TP4_PB
 
 ---
