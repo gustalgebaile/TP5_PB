@@ -65,6 +65,12 @@ jacoco {
     toolVersion = "0.8.14"
 }
 
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    manifest {
+        attributes["Main-Class"] = "com.biblioteca.BibliotecaWebApplication"
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)

@@ -1,6 +1,6 @@
 package com.biblioteca;
 
-import io.javalin.Javalin;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import com.biblioteca.repository.LivroRepository;
@@ -10,7 +10,7 @@ import com.biblioteca.service.BibliotecaService;
 public class BibliotecaWebApplication {
 
     public static void main(String[] args) {
-        Javalin app = Javalin.create().start(7000);
+        SpringApplication.run(BibliotecaWebApplication.class, args);
     }
 
     @Bean
