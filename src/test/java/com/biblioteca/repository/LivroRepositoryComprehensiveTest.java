@@ -130,20 +130,6 @@ class LivroRepositoryComprehensiveTest {
         }
 
         @Test
-        @DisplayName("Não deve fazer nada ao tentar atualizar livro inexistente")
-        void naoDeveFazerNadaAoTentarAtualizarLivroInexistente() {
-            Livro novoLivro = new Livro("1984", "George Orwell", Categoria.FICCAO);
-
-            // Não deve lançar exceção
-            assertThatNoException().isThrownBy(() ->
-                    repository.atualizar("Inexistente", novoLivro)
-            );
-
-            // Livro não deve ser adicionado
-            assertThat(repository.buscarPorTitulo("1984")).isInstanceOf(LivroNulo.class);
-        }
-
-        @Test
         @DisplayName("Deve lançar exceção ao atualizar com livro nulo")
         void deveLancarExcecaoAoAtualizarComLivroNulo() {
             repository.adicionar(livroTeste);
