@@ -1,0 +1,104 @@
+name: Pipeline Java com ambientes
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+
+  # ==========================
+  # JOB 1 — BUILD
+  # ==========================
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout de Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: gradle
+
+      - name: Dar permissão ao Gradlew
+        run: chmod +x gradlew
+
+      - name: Instalar Chrome (para Selenium)
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+
+      - name: Compilar, testar e construir JAR
+        run: ./gradlew clean test shadowJar
+
+      - name: Upload do JAR como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: build/libs/*-all.jar
+
+      - name: Build Summary
+        run: |
+          echo "## Resumo do Build" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
+          echo "- Relatório de testes: build/reports/tests/index.html" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================
+  # JOB 2 — DEPLOY DEV
+  # ==========================
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment: development
+
+    steps:
+      - name: Baixar artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+
+      - name: Deploy em ambiente de desenvolvimento
+        run: echo "Aplicação implantada em DEV"
+
+      - name: Deploy DEV Summary
+        run: |
+          echo "## Resumo Deploy DEV" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Ambiente: development" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================
+  # JOB 3 — DEPLOY PROD
+  # ==========================
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: https://meuapp-producao.com
+
+    steps:
+      - name: Baixar artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+
+      - name: Aprovação manual
+        run: echo "Aguardando aprovação para produção"
+
+      - name: Deploy em ambiente de produção
+        run: echo "Aplicação implantada em produção"
+
+      - name: Deploy PROD Summary
+        run: |
+          echo "## Resumo Deploy PROD" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Ambiente: production" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: https://meuapp-producao.com" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY

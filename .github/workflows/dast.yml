@@ -1,0 +1,123 @@
+name: DAST Scan
+
+on:
+  push:
+    branches: ["master","main"]
+  pull_request:
+    branches: ["master","main"]
+  workflow_dispatch:
+
+jobs:
+  dast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set Gradlew permission
+        run: chmod +x gradlew
+
+      - name: Build FAT JAR (ShadowJar)
+        run: ./gradlew clean shadowJar --no-daemon
+
+      - name: Verificar JAR gerado
+        run: |
+          echo "Conteúdo do build/libs:"
+          ls -lh build/libs/
+          echo ""
+          echo "Verificando conteúdo do JAR"
+          jar tf $(ls build/libs/*-all.jar | head -n 1) | head -20
+
+      - name: Start app in background
+        run: |
+          JAR=$(ls build/libs/*-all.jar | head -n 1)
+          echo "Iniciando app em Java: $JAR"
+          nohup java -jar "$JAR" > logs.txt 2>&1 &
+          echo $! > app.pid
+          echo "App PID: $(cat app.pid)"
+
+      - name: Wait for app to be ready
+        run: |
+          echo "Esperando aplicação iniciar na porta 7000..."
+          for i in {1..60}; do
+            if curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
+              echo "Aplicação está pronta!"
+              break
+            fi
+            echo "Tentativa $i/60..."
+            sleep 2
+          done
+          
+          if ! curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
+            echo "A aplicação não subiu. Logs:"
+            cat logs.txt || true
+            exit 1
+          fi
+
+      - name: Create report dir
+        run: mkdir -p zap-reports
+
+      - name: Run OWASP ZAP baseline scan
+        run: |
+          docker run --rm \
+            --network host \
+            -v $(pwd)/zap-reports:/zap/wrk:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t http://127.0.0.1:7000 \
+              -r zap_report.html \
+              -J zap_report.json \
+              -w zap_report.md \
+              -d
+        continue-on-error: true
+
+      - name: Show app logs
+        if: always()
+        run: |
+          echo "=== Logs da aplicação ==="
+          cat logs.txt || echo "Sem logs"
+
+      - name: List zap-reports
+        if: always()
+        run: |
+          echo "=== Relatórios gerados ==="
+          ls -lh zap-reports/ || echo "Diretório vazio"
+          find zap-reports -type f -exec ls -lh {} \;
+
+      - name: Stop app
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            echo "Parando aplicação (PID: $(cat app.pid))"
+            kill $(cat app.pid) || true
+            rm app.pid
+          fi
+
+      - name: Upload ZAP report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-dast-reports
+          path: |
+            zap-reports/
+            logs.txt
+          retention-days: 30
+          if-no-files-found: 'warn'
+
+      - name: DAST Summary
+        if: always()
+        run: |
+          echo "## Resumo DAST Scan" >> $GITHUB_STEP_SUMMARY
+          echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefatos gerados:" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.html" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.json" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.md" >> $GITHUB_STEP_SUMMARY
+          echo "- Logs da aplicação: logs.txt" >> $GITHUB_STEP_SUMMARY
