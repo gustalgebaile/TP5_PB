@@ -1,5 +1,4 @@
 name: DAST Scan
-
 on:
   push:
     branches: ["master","main"]
