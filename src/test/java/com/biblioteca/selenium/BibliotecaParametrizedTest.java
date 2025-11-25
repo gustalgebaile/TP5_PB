@@ -8,10 +8,9 @@ import com.biblioteca.test.pageobjects.FormularioLivroPage;
 import com.biblioteca.test.pageobjects.ListaLivrosPage;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
-import org.openqa.selenium.By;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -33,11 +32,11 @@ public class BibliotecaParametrizedTest {
 
     @BeforeEach
     void setUp() {
-        // Crie manualmente o serviço, igual à sua main class
         bibliotecaService = new BibliotecaService(new LivroRepository());
         bibliotecaService.limparBase();
 
-        driver = new WebDriverConfig().webDriver();
+        WebDriverConfig config = new WebDriverConfig();
+        driver = config.createWebDriver(WebDriverConfig.BrowserType.CHROME, true);
         baseUrl = "http://localhost:" + PORT;
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);

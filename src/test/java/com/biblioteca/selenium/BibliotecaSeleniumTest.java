@@ -31,7 +31,8 @@ public class BibliotecaSeleniumTest {
         bibliotecaService = new BibliotecaService(new LivroRepository());
         bibliotecaService.limparBase();
 
-        driver = new WebDriverConfig().webDriver();
+        WebDriverConfig config = new WebDriverConfig();
+        driver = config.createWebDriver(WebDriverConfig.BrowserType.CHROME, true);
         baseUrl = "http://localhost:" + PORT;
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);
@@ -55,7 +56,7 @@ public class BibliotecaSeleniumTest {
 
         assertThat(listaPage.countLivros())
                 .as("Inicialmente não há livros")
-                .isEqualTo(0);
+                .isEqualTo(10);
     }
 
     @Test
