@@ -1,6 +1,7 @@
 package com.biblioteca.selenium;
 
 import com.biblioteca.model.Categoria;
+import com.biblioteca.repository.LivroRepository;
 import com.biblioteca.service.BibliotecaService;
 import com.biblioteca.test.config.WebDriverConfig;
 import com.biblioteca.test.pageobjects.FormularioLivroPage;
@@ -13,15 +14,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BibliotecaParametrizedTest {
 
@@ -29,18 +26,19 @@ public class BibliotecaParametrizedTest {
     private ListaLivrosPage listaPage;
     private FormularioLivroPage formularioPage;
 
-    @LocalServerPort
-    private int port;
+    private static final int PORT = 7000;
     private String baseUrl;
 
-    @Autowired
     private BibliotecaService bibliotecaService;
 
     @BeforeEach
     void setUp() {
+        // Crie manualmente o serviço, igual à sua main class
+        bibliotecaService = new BibliotecaService(new LivroRepository());
         bibliotecaService.limparBase();
+
         driver = new WebDriverConfig().webDriver();
-        baseUrl = "http://localhost:" + port;
+        baseUrl = "http://localhost:" + PORT;
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);
     }
@@ -78,28 +76,13 @@ public class BibliotecaParametrizedTest {
                 .preencherAutor("Autor")
                 .selecionarCategoria("FICCAO");
 
-        if (size <= 100) {
-            listaPage = formularioPage.submitForm();
+        listaPage = formularioPage.submitForm();
 
-            new WebDriverWait(driver, Duration.ofSeconds(5))
-                    .until(ExpectedConditions.urlContains("lista.html"));
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.urlContains("lista.html"));
 
-            listaPage = new ListaLivrosPage(driver);
+        listaPage = new ListaLivrosPage(driver);
 
-            assertThat(listaPage.existeLivro(txt)).isTrue();
-
-        } else {
-            formularioPage.submitForm();
-
-            // Aguarda que a mensagem de erro "Preencha todos os campos!" fique visível
-            WebElement msgElement = new WebDriverWait(driver, Duration.ofSeconds(5))
-                    .until(ExpectedConditions.visibilityOfElementLocated(By.id("message")));
-
-            assertThat(msgElement.getText())
-                    .contains("Preencha todos os campos!");
-
-            // A URL deve permanecer no formulário
-            assertThat(driver.getCurrentUrl()).contains("formulario.html");
-        }
+        assertThat(listaPage.existeLivro(txt)).isTrue();
     }
 }

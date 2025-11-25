@@ -1,5 +1,6 @@
 package com.biblioteca.selenium;
 
+import com.biblioteca.repository.LivroRepository;
 import com.biblioteca.service.BibliotecaService;
 import com.biblioteca.test.config.WebDriverConfig;
 import com.biblioteca.test.pageobjects.FormularioLivroPage;
@@ -8,15 +9,11 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BibliotecaSeleniumTest {
 
@@ -24,19 +21,18 @@ public class BibliotecaSeleniumTest {
     private ListaLivrosPage listaPage;
     private FormularioLivroPage formularioPage;
 
-    @LocalServerPort
-    private int port;
-
+    private static final int PORT = 7000;
     private String baseUrl;
 
-    @Autowired
     private BibliotecaService bibliotecaService;
 
     @BeforeEach
     void setUp() {
+        bibliotecaService = new BibliotecaService(new LivroRepository());
         bibliotecaService.limparBase();
+
         driver = new WebDriverConfig().webDriver();
-        baseUrl = "http://localhost:" + port;
+        baseUrl = "http://localhost:" + PORT;
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);
     }
