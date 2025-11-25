@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Esperando aplicação iniciar na porta 8080..."
           for i in {1..60}; do
-            if curl -sSf "http://localhost:8080/lista.html" >/dev/null 2>&1; then
+            if curl -sSf "http://localhost:8080/api/livros" >/dev/null 2>&1; then
               echo "Aplicação está pronta!"
               break
             fi
@@ -55,7 +55,7 @@ jobs:
             sleep 2
           done
           
-          if ! curl -sSf "http://localhost:8080/lista.html" >/dev/null 2>&1; then
+          if ! curl -sSf "http://localhost:8080/api/livros" >/dev/null 2>&1; then
             echo "A aplicação não subiu. Logs:"
             cat logs.txt || true
             exit 1
@@ -71,7 +71,7 @@ jobs:
             -v $(pwd)/zap-reports:/zap/wrk:rw \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
-              -t http://127.0.0.1:8080/lista.html \
+              -t http://127.0.0.1:8080 \
               -r zap_report.html \
               -J zap_report.json \
               -w zap_report.md \
