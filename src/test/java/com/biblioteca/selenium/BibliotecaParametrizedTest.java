@@ -38,8 +38,29 @@ public class BibliotecaParametrizedTest {
         WebDriverConfig config = new WebDriverConfig();
         driver = config.createWebDriver(WebDriverConfig.BrowserType.CHROME, true);
         baseUrl = "http://localhost:" + PORT;
+
+        // Espera até 30s a aplicação estar disponível
+        waitForApp();
+
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);
+    }
+
+    private void waitForApp() {
+        int attempts = 0;
+        boolean up = false;
+        while (attempts < 15 && !up) {
+            try {
+                driver.get(baseUrl + "/lista.html");
+                up = true;
+            } catch (Exception e) {
+                attempts++;
+                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+            }
+        }
+        if (!up) {
+            throw new RuntimeException("Aplicação não está disponível em " + baseUrl + "/lista.html");
+        }
     }
 
     @AfterEach
@@ -52,12 +73,18 @@ public class BibliotecaParametrizedTest {
     @Order(1)
     void testCadastroCategorias(Categoria categoria) {
         String titulo = "Livro" + categoria.name();
+
         formularioPage = listaPage.clickNovoLivro();
         formularioPage
                 .preencherTitulo(titulo)
                 .preencherAutor("Autor")
-                .selecionarCategoria(categoria.name())
-                .submitForm();
+                .selecionarCategoria(categoria.name());
+
+        listaPage = formularioPage.submitForm();
+
+        // Aguarda até 10s a lista conter o livro cadastrado
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(d -> listaPage.existeLivro(titulo));
 
         assertThat(listaPage.existeLivro(titulo))
                 .as("Deve cadastrar categoria " + categoria)
@@ -69,6 +96,7 @@ public class BibliotecaParametrizedTest {
     @Order(2)
     void testBoundary(int size) {
         String txt = "a".repeat(size);
+
         formularioPage = listaPage.clickNovoLivro();
         formularioPage
                 .preencherTitulo(txt)
@@ -77,10 +105,8 @@ public class BibliotecaParametrizedTest {
 
         listaPage = formularioPage.submitForm();
 
-        new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.urlContains("lista.html"));
-
-        listaPage = new ListaLivrosPage(driver);
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(d -> listaPage.existeLivro(txt));
 
         assertThat(listaPage.existeLivro(txt)).isTrue();
     }
