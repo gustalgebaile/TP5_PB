@@ -19,9 +19,11 @@ public class BibliotecaService {
     public BibliotecaService(LivroRepository repository) {
         this.repository = Objects.requireNonNull(repository);
     }
+
     public void adicionarLivro(Livro livro) {
         repository.adicionar(Objects.requireNonNull(livro));
     }
+
     public void atualizarLivro(String tituloAntigo, Livro novoLivro) {
         var existente = repository.buscarPorTitulo(tituloAntigo);
         if (existente instanceof LivroNulo) {
@@ -29,6 +31,7 @@ public class BibliotecaService {
         }
         repository.atualizar(tituloAntigo, Objects.requireNonNull(novoLivro));
     }
+
     public void removerLivro(String titulo) {
         var existente = repository.buscarPorTitulo(titulo);
         if (existente instanceof LivroNulo) {
@@ -36,6 +39,7 @@ public class BibliotecaService {
         }
         repository.remover(titulo);
     }
+
     public Livro buscarLivro(String titulo) {
         var livro = repository.buscarPorTitulo(titulo);
         if (livro instanceof LivroNulo) {
@@ -43,11 +47,13 @@ public class BibliotecaService {
         }
         return livro;
     }
+
     public List<Livro> listarLivros() {
         var livros = repository.listarTodos();
         livros.forEach(System.out::println);
         return Collections.unmodifiableList(livros);
     }
+
     public void limparBase() {
         repository.limpar();
     }

@@ -1,27 +1,47 @@
 package com.biblioteca.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import io.javalin.http.Context;
+import io.javalin.Javalin;
+import com.biblioteca.exception.LivroNaoEncontradoException;
+import com.biblioteca.exception.LivroDuplicadoException;
 
-@ControllerAdvice
 public class BibliotecaExceptionHandler {
 
-    @ExceptionHandler(LivroNaoEncontradoException.class)
-    public ResponseEntity<String> handleLivroNaoEncontrado(LivroNaoEncontradoException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public static void register(Javalin app) {
+        app.exception(LivroNaoEncontradoException.class, (e, ctx) -> {
+            handleNotFound(ctx, e.getMessage());
+        });
+
+        app.exception(LivroDuplicadoException.class, (e, ctx) -> {
+            handleConflict(ctx, e.getMessage());
+        });
+
+        app.exception(Exception.class, (e, ctx) -> {
+            handleInternalServerError(ctx, "Erro inesperado: " + e.getMessage());
+            e.printStackTrace();
+        });
     }
 
-    @ExceptionHandler(LivroDuplicadoException.class)
-    public ResponseEntity<String> handleLivroDuplicado(LivroDuplicadoException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    private static void handleNotFound(Context ctx, String message) {
+        ctx.status(404);
+        ctx.json(new ErrorResponse(message));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenerico(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Erro inesperado: " + ex.getMessage());
+    private static void handleConflict(Context ctx, String message) {
+        ctx.status(409);
+        ctx.json(new ErrorResponse(message));
+    }
+
+    private static void handleInternalServerError(Context ctx, String message) {
+        ctx.status(500);
+        ctx.json(new ErrorResponse(message));
+    }
+
+    static class ErrorResponse {
+        public final String error;
+
+        public ErrorResponse(String error) {
+            this.error = error;
+        }
     }
 }
-
