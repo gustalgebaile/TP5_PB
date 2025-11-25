@@ -1,10 +1,11 @@
 package com.biblioteca.dto;
 
+import com.biblioteca.dto.LivroDto;
 import com.biblioteca.model.Categoria;
 import com.biblioteca.model.Livro;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LivroDtoTest {
 

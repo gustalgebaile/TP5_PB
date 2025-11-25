@@ -30,7 +30,7 @@ public class ListaLivrosPage extends BasePage {
         return waitForElement(booksTable).isDisplayed();
     }
 
-    public FormularioLivroPage clickNovoLivro() {
+    public com.biblioteca.test.pageobjects.FormularioLivroPage clickNovoLivro() {
         waitForElementToBeClickable(btnNovo).click();
         return new FormularioLivroPage(driver);
     }

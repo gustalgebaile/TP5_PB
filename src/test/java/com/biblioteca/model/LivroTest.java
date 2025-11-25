@@ -1,6 +1,9 @@
 package com.biblioteca.model;
 
+import com.biblioteca.model.Categoria;
+import com.biblioteca.model.Livro;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LivroTest {

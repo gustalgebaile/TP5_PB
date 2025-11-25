@@ -4,6 +4,7 @@ import com.biblioteca.exception.LivroDuplicadoException;
 import com.biblioteca.model.Categoria;
 import com.biblioteca.model.Livro;
 import com.biblioteca.model.LivroNulo;
+import com.biblioteca.repository.LivroRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

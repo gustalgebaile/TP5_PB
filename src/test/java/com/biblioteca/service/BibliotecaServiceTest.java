@@ -5,6 +5,7 @@ import com.biblioteca.exception.LivroNaoEncontradoException;
 import com.biblioteca.model.Categoria;
 import com.biblioteca.model.Livro;
 import com.biblioteca.repository.LivroRepository;
+import com.biblioteca.service.BibliotecaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

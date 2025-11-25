@@ -12,7 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BibliotecaSeleniumTest {
@@ -86,18 +86,14 @@ public class BibliotecaSeleniumTest {
                 .selecionarCategoria(cat)
                 .submitForm();
 
-        // Aguarda até 5s o JS redirecionar para lista.html
         new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.urlContains("lista.html"));
 
-        // Reconstrói a página de lista após redirecionamento
         listaPage = new ListaLivrosPage(driver);
 
-        // Verifica URL correta
         assertThat(driver.getCurrentUrl())
                 .contains("lista.html");
 
-        // Verifica se o livro cadastrado aparece na lista
         assertThat(listaPage.existeLivro(titulo))
                 .as("Livro deve aparecer na lista")
                 .isTrue();

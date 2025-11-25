@@ -41,13 +41,13 @@ public class FormularioLivroPage extends BasePage {
         return this;
     }
 
-    public ListaLivrosPage submitForm() {
+    public com.biblioteca.test.pageobjects.ListaLivrosPage submitForm() {
         waitForElementToBeClickable(btnSalvar).click();
         waitForPageLoad();
-        return new ListaLivrosPage(driver);
+        return new com.biblioteca.test.pageobjects.ListaLivrosPage(driver);
     }
 
-    public ListaLivrosPage cancelar() {
+    public com.biblioteca.test.pageobjects.ListaLivrosPage cancelar() {
         waitForElementToBeClickable(btnCancelar).click();
         return new ListaLivrosPage(driver);
     }

@@ -18,16 +18,15 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("org.slf4j:slf4j-simple:2.0.16")
 
-
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testImplementation("org.junit.platform:junit-platform-launcher:1.9.3")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
     testImplementation("org.seleniumhq.selenium:selenium-java:4.11.0")
     testImplementation("io.github.bonigarcia:webdrivermanager:5.5.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.4")
     testImplementation("org.awaitility:awaitility:4.2.0")
 }
+
 sourceSets {
     main {
         java.srcDirs("src/main/java")
@@ -77,7 +76,6 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
-
     reports {
         xml.required.set(true)
         html.required.set(true)
