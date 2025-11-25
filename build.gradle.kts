@@ -14,9 +14,8 @@ repositories {
 }
 
 dependencies {
-    api("org.springframework.boot:spring-boot-starter-web:3.1.4")
-    api("org.springframework.boot:spring-boot-starter-validation:3.1.4")
-    runtimeOnly("org.springframework.boot:spring-boot-devtools:3.1.4")
+    implementation("io.javalin:javalin:6.7.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testImplementation("org.junit.platform:junit-platform-launcher:1.9.3")
