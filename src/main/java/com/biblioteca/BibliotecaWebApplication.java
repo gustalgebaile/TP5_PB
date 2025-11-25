@@ -23,4 +23,21 @@ public class BibliotecaWebApplication {
 
         new BibliotecaRestController(app, service);
     }
+    public static Javalin createApp(int port) {
+        LivroRepository livroRepository = new LivroRepository();
+        BibliotecaService service = new BibliotecaService(livroRepository);
+        Javalin app = Javalin.create(config -> {
+            config.staticFiles.add(staticFile -> {
+                staticFile.hostedPath = "/";
+                staticFile.directory = "/public";
+                staticFile.location = io.javalin.http.staticfiles.Location.CLASSPATH;
+            });
+        });
+
+        app.get("/", ctx -> ctx.redirect("/lista.html"));
+
+        new BibliotecaRestController(app, service);
+
+        return app;
+    }
 }
