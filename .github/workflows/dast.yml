@@ -1,4 +1,5 @@
 name: DAST Scan
+
 on:
   push:
     branches: ["master","main"]
@@ -11,95 +12,95 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: [ Checkout ](pplx://action/translate)
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: [ Setup Java ](pplx://action/translate)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: [ Set Gradlew permission ](pplx://action/translate)
+      - name: Set Gradlew permission
         run: chmod +x gradlew
 
-      - name: [ Build FAT JAR (ShadowJar) ](pplx://action/translate)
+      - name: Build FAT JAR (ShadowJar)
         run: ./gradlew clean shadowJar --no-daemon
 
-      - name: [ Verificar JAR gerado ](pplx://action/translate)
+      - name: Verificar JAR gerado
         run: |
-          echo ["Conteúdo do build/libs:"](pplx://action/translate)
+          echo "Conteúdo do build/libs:"
           ls -lh build/libs/
           echo ""
-          echo ["Verificando conteúdo do JAR"](pplx://action/translate)
+          echo "Verificando conteúdo do JAR"
           jar tf $(ls build/libs/*-all.jar | head -n 1) | head -20
 
-      - name: [ Start app in background ](pplx://action/translate)
+      - name: Start app in background
         run: |
           JAR=$(ls build/libs/*-all.jar | head -n 1)
-          echo ["Iniciando app em Java: $JAR"](pplx://action/translate)
+          echo "Iniciando app em Java: $JAR"
           nohup java -jar "$JAR" > logs.txt 2>&1 &
           echo $! > app.pid
-          echo ["App PID: $(cat app.pid)"](pplx://action/translate)
+          echo "App PID: $(cat app.pid)"
 
-      - name: [ Wait for app to be ready ](pplx://action/translate)
+      - name: Wait for app to be ready
         run: |
-          echo ["Esperando aplicação iniciar na porta 8080..."](pplx://action/translate)
+          echo "Esperando aplicação iniciar na porta 8080..."
           for i in {1..60}; do
             if curl -sSf "http://localhost:8080/lista.html" >/dev/null 2>&1; then
-              echo ["Aplicação está pronta!"](pplx://action/translate)
+              echo "Aplicação está pronta!"
               break
             fi
-            echo ["Tentativa $i/60..."](pplx://action/translate)
+            echo "Tentativa $i/60..."
             sleep 2
           done
-
+          
           if ! curl -sSf "http://localhost:8080/lista.html" >/dev/null 2>&1; then
-            echo ["A aplicação não subiu. Logs:"](pplx://action/translate)
+            echo "A aplicação não subiu. Logs:"
             cat logs.txt || true
             exit 1
           fi
 
-      - name: [ Create report dir ](pplx://action/translate)
+      - name: Create report dir
         run: mkdir -p zap-reports
 
-      - name: [ Run OWASP ZAP baseline scan ](pplx://action/translate)
+      - name: Run OWASP ZAP baseline scan
         run: |
           docker run --rm \
             --network host \
             -v $(pwd)/zap-reports:/zap/wrk:rw \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
-              -t [http://127.0.0.1:8080/lista.html](http://127.0.0.1:8080/lista.html) \
+              -t http://127.0.0.1:8080/lista.html \
               -r zap_report.html \
               -J zap_report.json \
               -w zap_report.md \
               -d
         continue-on-error: true
 
-      - name: [ Show app logs ](pplx://action/translate)
+      - name: Show app logs
         if: always()
         run: |
-          echo ["=== Logs da aplicação ==="](pplx://action/translate)
-          cat logs.txt || echo ["Sem logs"](pplx://action/translate)
+          echo "=== Logs da aplicação ==="
+          cat logs.txt || echo "Sem logs"
 
-      - name: [ List zap-reports ](pplx://action/translate)
+      - name: List zap-reports
         if: always()
         run: |
-          echo ["=== Relatórios gerados ==="](pplx://action/translate)
-          ls -lh zap-reports/ || echo ["Diretório vazio"](pplx://action/translate)
+          echo "=== Relatórios gerados ==="
+          ls -lh zap-reports/ || echo "Diretório vazio"
           find zap-reports -type f -exec ls -lh {} \;
 
-      - name: [ Stop app ](pplx://action/translate)
+      - name: Stop app
         if: always()
         run: |
           if [ -f app.pid ]; then
-            echo ["Parando aplicação (PID: $(cat app.pid))"](pplx://action/translate)
+            echo "Parando aplicação (PID: $(cat app.pid))"
             kill $(cat app.pid) || true
             rm app.pid
           fi
 
-      - name: [ Upload ZAP report as artifact ](pplx://action/translate)
+      - name: Upload ZAP report as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -110,13 +111,13 @@ jobs:
           retention-days: 30
           if-no-files-found: 'warn'
 
-      - name: [ DAST Summary ](pplx://action/translate)
+      - name: DAST Summary
         if: always()
         run: |
-          echo "[## Resumo DAST Scan](pplx://action/translate)" >> $GITHUB_STEP_SUMMARY
-          echo "- [Status do Job](pplx://action/translate): ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "- [Artefatos gerados:](pplx://action/translate)" >> $GITHUB_STEP_SUMMARY
+          echo "## Resumo DAST Scan" >> $GITHUB_STEP_SUMMARY
+          echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefatos gerados:" >> $GITHUB_STEP_SUMMARY
           echo "  - zap-reports/zap_report.html" >> $GITHUB_STEP_SUMMARY
           echo "  - zap-reports/zap_report.json" >> $GITHUB_STEP_SUMMARY
           echo "  - zap-reports/zap_report.md" >> $GITHUB_STEP_SUMMARY
-          echo "- [Logs da aplicação: logs.txt](pplx://action/translate)" >> $GITHUB_STEP_SUMMARY
+          echo "- Logs da aplicação: logs.txt" >> $GITHUB_STEP_SUMMARY
