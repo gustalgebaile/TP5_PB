@@ -7,6 +7,8 @@ import com.biblioteca.test.pageobjects.FormularioLivroPage;
 import com.biblioteca.test.pageobjects.ListaLivrosPage;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -31,8 +33,13 @@ public class BibliotecaSeleniumTest {
         bibliotecaService = new BibliotecaService(new LivroRepository());
         bibliotecaService.limparBase();
 
-        WebDriverConfig config = new WebDriverConfig();
-        driver = config.createWebDriver(WebDriverConfig.BrowserType.CHROME, true);
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080");
+        driver = new ChromeDriver(options);
+
         baseUrl = "http://localhost:" + PORT;
         driver.get(baseUrl + "/lista.html");
         listaPage = new ListaLivrosPage(driver);
